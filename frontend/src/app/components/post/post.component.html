@@ -1,0 +1,37 @@
+<div class="container">
+  <div *ngFor="let post of posts" class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title text-capitalize">{{ post.title }}</h5>
+      <p class="card-text">{{ post.body }}</p>
+
+      <div class="d-flex justify-content-between text-muted mb-2">
+        <small><strong>By:</strong> {{ post.user.name }}</small>
+        <small
+          ><strong>Posted on:</strong>
+          {{ post.createdAt | date : "medium" }}</small
+        >
+      </div>
+
+      <div class="d-flex gap-3 mb-3">
+        <button (click)="likePost(post.id)">Like</button>
+        <button (click)="dislikePost(post.id)">DisLike</button>
+
+        <span class="badge bg-success">Likes: {{ post.likes }}</span>
+        <span class="badge bg-danger">Dislikes: {{ post.dislikes }}</span>
+      </div>
+
+      <div *ngIf="post.comments.length > 0">
+        <h6 class="text-secondary">Comments:</h6>
+        <ul class="list-group list-group-flush">
+          <li *ngFor="let comment of post.comments" class="list-group-item">
+            <p class="mb-1">{{ comment.body }}</p>
+            <div class="d-flex justify-content-between text-muted">
+              <small>— {{ comment.user.name }}</small>
+              <small>{{ comment.createdAt | date : "short" }}</small>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
