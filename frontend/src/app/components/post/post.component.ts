@@ -10,6 +10,7 @@ import { Component } from '@angular/core';
 })
 export class PostComponent {
   posts: Post[];
+  selectedPostId: number | null = null;
 
   constructor() {
     this.posts = dummyPosts;
@@ -24,8 +25,21 @@ export class PostComponent {
 
   dislikePost(id: number) {
     const dislikePost = this.posts.find((d) => d.id === id)!;
+    if (dislikePost.id === id) {
+      dislikePost.dislikes--;
+    }
     dislikePost.dislikes++;
   }
+
+  toggleComments(id: number) {
+    if (this.selectedPostId === id) {
+      this.selectedPostId = null;
+    } else {
+      this.selectedPostId = id;
+    }
+  }
+
+  // console.log(id);
 }
 
 type Post = {
