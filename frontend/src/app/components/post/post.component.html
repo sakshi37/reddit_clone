@@ -13,14 +13,18 @@
       </div>
 
       <div class="d-flex gap-3 mb-3">
-        <!-- <button (click)="likePost(post.id)">Like</button> -->
+        <!-- <button    (click)="likePost(post.id)">Like</button> -->
         <!-- <button (click)="dislikePost(post.id)">DisLike</button> -->
 
-        <button (click)="likePost(post.id)" class="badge bg-success">
-          Likes: {{ post.likes }}
+        <button (click)="likePost(post.id)" class="favorite-btn">
+          <DIV [style.color]="post.liked ? 'green' : 'black'">
+            Likes: {{ post.likes }}
+          </DIV>
         </button>
-        <button (click)="dislikePost(post.id)" class="badge bg-danger">
-          Dislikes: {{ post.dislikes }}
+        <button (click)="dislikePost(post.id)" class="favorite-btn">
+          <div [style.color]="post.disliked ? 'red' : 'black'">
+            Dislikes: {{ post.dislikes }}
+          </div>
         </button>
       </div>
 
@@ -39,6 +43,10 @@
             </li>
           </ul>
         </div>
+
+        <input type="text" [(ngModel)]="commentBody" />
+
+        <button (click)="addComment(post.id)">Add comment</button>
       </div>
     </div>
   </div>

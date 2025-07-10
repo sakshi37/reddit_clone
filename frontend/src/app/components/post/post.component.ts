@@ -1,37 +1,65 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-post',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
 })
 export class PostComponent {
-  posts: Post[];
+  posts: (Post & { disliked: boolean; liked: boolean })[];
   selectedPostId: number | null = null;
+  commentBody = '';
 
   constructor() {
-    this.posts = dummyPosts;
+    this.posts = dummyPosts.map((p) => {
+      return { ...p, disliked: false, liked: false };
+    });
   }
 
   likePost(id: number) {
     const post = this.posts.find((p) => p.id === id)!;
-    post.likes++;
+    if (post.liked === false) {
+      post.likes++;
+      post.liked = true;
+    } else {
+      post.likes--;
+      post.liked = false;
+    }
 
     console.log(this.posts);
+  }
+  //
+  addComment(postId: number) {
+    const dummyComent: CommentType = {
+      id: 1,
+      user: { id: 1, name: 'sakshi' },
+      createdAt: new Date(),
+      body: this.commentBody,
+    };
+
+    const post = this.posts.find((p) => p.id === postId);
+    post?.comments.push(dummyComent);
+    this.commentBody = '';
   }
 
   dislikePost(id: number) {
     const dislikePost = this.posts.find((d) => d.id === id)!;
-    if (dislikePost.id === id) {
+    // dislikePost.disliked = true;
+    if (dislikePost.disliked === false) {
+      dislikePost.dislikes++;
+      dislikePost.disliked = true;
+    } else {
       dislikePost.dislikes--;
+      dislikePost.disliked = false;
     }
-    dislikePost.dislikes++;
   }
 
   toggleComments(id: number) {
+    this.commentBody = '';
     if (this.selectedPostId === id) {
       this.selectedPostId = null;
     } else {
@@ -82,6 +110,13 @@ const dummyPosts: Post[] = [
         user: { id: 3, name: 'Sam Smith' },
         createdAt: new Date('2025-07-01T11:00:00Z'),
         body: 'Still learning it, but it already helps me write better code.',
+      },
+
+      {
+        id: 3,
+        user: { id: 4, name: 'sakshi Bahirat' },
+        createdAt: new Date(),
+        body: 'hellooo',
       },
     ],
     likes: 120,
