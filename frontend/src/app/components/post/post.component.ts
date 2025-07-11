@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-post',
   standalone: true,
@@ -10,33 +11,48 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './post.component.css',
 })
 export class PostComponent {
-  posts: (Post & { disliked: boolean; liked: boolean })[];
+  posts: (Post & {
+    disliked: boolean;
+    liked: boolean;
+  })[];
+  // we increment the count of like and set liked as true
+  // decrement the count  and set liked as false
   selectedPostId: number | null = null;
   commentBody = '';
-
+  newPost = { id: 10, title: '', body: '' };
+  user = { id: 1, name: 'sakshi bahirat' };
   constructor() {
     this.posts = dummyPosts.map((p) => {
-      return { ...p, disliked: false, liked: false };
+      return {
+        ...p,
+        disliked: false,
+        liked: false,
+      };
     });
   }
+  //store current id and whjen we add post inceremnt the id
+  addPost() {
+    const dummyPost: Post = {
+      body: this.newPost.body,
+      id: this.newPost.id,
+      comments: [],
+      createdAt: new Date(),
+      dislikes: 0,
+      likes: 0,
+      title: this.newPost.title,
+      user: this.user,
+    };
 
-  likePost(id: number) {
-    const post = this.posts.find((p) => p.id === id)!;
-    if (post.liked === false) {
-      post.likes++;
-      post.liked = true;
-    } else {
-      post.likes--;
-      post.liked = false;
-    }
-
-    console.log(this.posts);
+    this.posts.push({ ...dummyPost, disliked: false, liked: false });
+    this.newPost.body = '';
+    this.newPost.title = '';
+    this.newPost.id++;
   }
   //
   addComment(postId: number) {
     const dummyComent: CommentType = {
       id: 1,
-      user: { id: 1, name: 'sakshi' },
+      user: this.user,
       createdAt: new Date(),
       body: this.commentBody,
     };
@@ -46,10 +62,31 @@ export class PostComponent {
     this.commentBody = '';
   }
 
+  likePost(id: number) {
+    const post = this.posts.find((p) => p.id === id)!;
+    if (post.liked === false) {
+      if (post.disliked === true) {
+        post.dislikes--;
+        post.disliked = false;
+      }
+      post.likes++;
+      post.liked = true;
+    } else {
+      post.likes--;
+      post.liked = false;
+    }
+    console.log(this.posts);
+  }
+
   dislikePost(id: number) {
     const dislikePost = this.posts.find((d) => d.id === id)!;
     // dislikePost.disliked = true;
+
     if (dislikePost.disliked === false) {
+      if (dislikePost.liked === true) {
+        dislikePost.likes--;
+        dislikePost.liked = false;
+      }
       dislikePost.dislikes++;
       dislikePost.disliked = true;
     } else {
@@ -150,5 +187,26 @@ const dummyPosts: Post[] = [
     dislikes: 8,
     user: { id: 6, name: 'Michael Chen' },
     createdAt: new Date('2025-07-05T08:45:00Z'),
+  },
+
+  {
+    id: 4,
+    title: 'new post',
+    body: 'ello',
+    comments: [],
+    likes: 1,
+    dislikes: 2,
+    user: { id: 7, name: 'Akshata Dange' },
+    createdAt: new Date(),
+  },
+  {
+    id: 5,
+    title: 'Bhushan is my love',
+    body: 'Very handsome, intelligent and funny ',
+    comments: [],
+    likes: 1,
+    dislikes: 2,
+    user: { id: 8, name: 'sAKSHI bahirat' },
+    createdAt: new Date(),
   },
 ];
