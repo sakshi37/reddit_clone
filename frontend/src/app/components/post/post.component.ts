@@ -2,7 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { Title } from '@angular/platform-browser';
+/*
+  1 like Dislike on comments 
+  2 Delete post
+  3 Update post
+  4 Delete comment
+  5 Update Comment
+  6 comments on comment
+*/
 @Component({
   selector: 'app-post',
   standalone: true,
@@ -14,13 +21,17 @@ export class PostComponent {
   posts: (Post & {
     disliked: boolean;
     liked: boolean;
+    comments: CommentType[];
   })[];
-  // we increment the count of like and set liked as true
-  // decrement the count  and set liked as false
+
+  //
+  // postComment: (CommentType & { likes: number; dislikes: number })[];
   selectedPostId: number | null = null;
-  commentBody = '';
+  selectedComment: number | null = null;
+  comment = { body: '', id: 10 };
   newPost = { id: 10, title: '', body: '' };
   user = { id: 1, name: 'sakshi bahirat' };
+
   constructor() {
     this.posts = dummyPosts.map((p) => {
       return {
@@ -30,9 +41,43 @@ export class PostComponent {
       };
     });
   }
-  //store current id and whjen we add post inceremnt the id
+  likeComment(postid: number, commentid: number) {
+    const post = this.posts.find((p) => p.id == postid);
+    if (post === undefined) return;
+    const comment = post.comments.find((c) => c.id === commentid);
+    if (comment === undefined) return;
+    if (comment.liked === false) {
+      if (comment.disliked === true) {
+        comment.dislikes--;
+        comment.disliked = false;
+      }
+      comment.likes += 1;
+      comment.liked = true;
+    } else {
+      comment.likes--;
+      comment.liked = false;
+    }
+  }
+
+  dislikeComment(postId: number, commentId: number) {
+    const post = this.posts.find((p) => p.id === postId);
+    if (post === undefined) return;
+    const comment = post.comments.find((c) => c.id === commentId);
+    if (comment === undefined) return;
+    if (comment.disliked === false) {
+      if (comment.liked === true) {
+        comment.likes--;
+        comment.liked = false;
+      }
+      comment.dislikes++;
+      comment.disliked = true;
+    } else {
+      comment.dislikes--;
+      comment.disliked = false;
+    }
+  }
   addPost() {
-    const dummyPost: Post = {
+    this.posts.push({
       body: this.newPost.body,
       id: this.newPost.id,
       comments: [],
@@ -41,25 +86,30 @@ export class PostComponent {
       likes: 0,
       title: this.newPost.title,
       user: this.user,
-    };
-
-    this.posts.push({ ...dummyPost, disliked: false, liked: false });
+      disliked: false,
+      liked: false,
+    });
     this.newPost.body = '';
     this.newPost.title = '';
     this.newPost.id++;
   }
-  //
+  //we want user id thre right on comment comment id
   addComment(postId: number) {
     const dummyComent: CommentType = {
-      id: 1,
+      id: this.comment.id,
       user: this.user,
       createdAt: new Date(),
-      body: this.commentBody,
+      body: this.comment.body,
+      likes: 0,
+      dislikes: 0,
+      liked: false,
+      disliked: false,
     };
 
     const post = this.posts.find((p) => p.id === postId);
     post?.comments.push(dummyComent);
-    this.commentBody = '';
+    this.comment.body = '';
+    this.comment.id++;
   }
 
   likePost(id: number) {
@@ -96,7 +146,7 @@ export class PostComponent {
   }
 
   toggleComments(id: number) {
-    this.commentBody = '';
+    this.comment.body = '';
     if (this.selectedPostId === id) {
       this.selectedPostId = null;
     } else {
@@ -128,6 +178,10 @@ type CommentType = {
   user: User;
   createdAt: Date;
   body: string;
+  likes: number;
+  dislikes: number;
+  liked: boolean;
+  disliked: boolean;
 };
 
 const dummyPosts: Post[] = [
@@ -141,12 +195,21 @@ const dummyPosts: Post[] = [
         user: { id: 2, name: 'Jane Doe' },
         createdAt: new Date('2025-07-01T10:15:00Z'),
         body: 'Absolutely agree! I love working with TypeScript.',
+        likes: 1,
+        dislikes: 1,
+        liked: false,
+        disliked: false,
       },
+
       {
         id: 2,
         user: { id: 3, name: 'Sam Smith' },
         createdAt: new Date('2025-07-01T11:00:00Z'),
         body: 'Still learning it, but it already helps me write better code.',
+        likes: 1,
+        dislikes: 1,
+        liked: false,
+        disliked: false,
       },
 
       {
@@ -154,6 +217,10 @@ const dummyPosts: Post[] = [
         user: { id: 4, name: 'sakshi Bahirat' },
         createdAt: new Date(),
         body: 'hellooo',
+        likes: 1,
+        dislikes: 1,
+        liked: false,
+        disliked: false,
       },
     ],
     likes: 120,
@@ -171,6 +238,10 @@ const dummyPosts: Post[] = [
         user: { id: 4, name: 'Alice Johnson' },
         createdAt: new Date('2025-07-03T14:20:00Z'),
         body: "I can't live without dark mode anymore!",
+        likes: 1,
+        dislikes: 1,
+        liked: false,
+        disliked: false,
       },
     ],
     likes: 95,
@@ -199,14 +270,14 @@ const dummyPosts: Post[] = [
     user: { id: 7, name: 'Akshata Dange' },
     createdAt: new Date(),
   },
-  {
-    id: 5,
-    title: 'Bhushan is my love',
-    body: 'Very handsome, intelligent and funny ',
-    comments: [],
-    likes: 1,
-    dislikes: 2,
-    user: { id: 8, name: 'sAKSHI bahirat' },
-    createdAt: new Date(),
-  },
+  // {
+  //   id: 5,
+  //   title: 'Bhushan is my love',
+  //   body: 'Very handsome, intelligent and funny ',
+  //   comments: [],
+  //   likes: 1,
+  //   dislikes: 2,
+  //   user: { id: 8, name: 'sAKSHI bahirat' },
+  //   createdAt: new Date(),
+  // },
 ];

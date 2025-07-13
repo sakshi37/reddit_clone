@@ -37,22 +37,33 @@
 
       <div class="d-flex gap-3 align-items-center mb-3">
         <button
-          class="btn btn-outline-success btn-sm"
+          class="btn btn-sm"
+          [ngClass]="{
+            'btn-outline-success': !post.liked,
+            'btn-success text-white': post.liked
+          }"
           (click)="likePost(post.id)"
         >
-          <i class="bi bi-hand-thumbs-up-fill me-1"></i>
-          <span [style.color]="post.liked ? 'green' : 'black'"></span>
+          <i
+            class="bi bi-hand-thumbs-up-fill me-1"
+            [style.color]="post.liked ? 'white' : 'green'"
+          ></i>
           {{ post.likes }}
         </button>
 
         <button
-          class="btn btn-outline-danger btn-sm"
+          class="btn btn-sm"
+          [ngClass]="{
+            'btn-outline-danger': !post.disliked,
+            'btn-danger text-white': post.disliked
+          }"
           (click)="dislikePost(post.id)"
         >
-          <i class="bi bi-hand-thumbs-down-fill me-1"></i>
-          <span [style.color]="post.disliked ? 'red' : 'black'">
-            {{ post.dislikes }}</span
-          >
+          <i
+            class="bi bi-hand-thumbs-down-fill me-1"
+            [style.color]="post.disliked ? 'white' : 'red'"
+          ></i>
+          {{ post.dislikes }}
         </button>
       </div>
 
@@ -75,6 +86,39 @@
         >
           <li *ngFor="let comment of post.comments" class="list-group-item">
             <p class="mb-1">{{ comment.body }}</p>
+
+            <div class="d-flex gap-2 align-items-center mb-2">
+              <button
+                class="btn btn-sm"
+                [ngClass]="{
+                  'btn-outline-success': !comment.liked,
+                  'btn-success text-white': comment.liked
+                }"
+                (click)="likeComment(post.id, comment.id)"
+              >
+                <i
+                  class="bi bi-hand-thumbs-up-fill me-1"
+                  [style.color]="comment.liked ? 'white' : 'green'"
+                ></i>
+                {{ comment.likes }}
+              </button>
+
+              <button
+                class="btn btn-sm"
+                [ngClass]="{
+                  'btn-outline-danger': !comment.disliked,
+                  'btn-danger text-white': comment.disliked
+                }"
+                (click)="dislikeComment(post.id, comment.id)"
+              >
+                <i
+                  class="bi bi-hand-thumbs-down-fill me-1"
+                  [style.color]="comment.disliked ? 'white' : 'red'"
+                ></i>
+                {{ comment.dislikes }}
+              </button>
+            </div>
+
             <div class="d-flex justify-content-between text-muted">
               <small>— {{ comment.user.name }}</small>
               <small>{{ comment.createdAt | date : "short" }}</small>
@@ -87,7 +131,7 @@
             type="text"
             class="form-control"
             placeholder="Write a comment..."
-            [(ngModel)]="commentBody"
+            [(ngModel)]="comment.body"
           />
           <button class="btn btn-outline-primary" (click)="addComment(post.id)">
             Add
