@@ -2,18 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { CommentComponent } from '../comment/comment.component';
 /*
   1 like Dislike on comments 
   2 Delete post
   3 Update post
   4 Delete comment
   5 Update Comment
-  6 comments on comment
+  6 comment on comment
 */
 @Component({
   selector: 'app-post',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, CommentComponent],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
 })
@@ -24,13 +25,13 @@ export class PostComponent {
     comments: CommentType[];
   })[];
 
-  //
-  // postComment: (CommentType & { likes: number; dislikes: number })[];
   selectedPostId: number | null = null;
   selectedComment: number | null = null;
   comment = { body: '', id: 10 };
   newPost = { id: 10, title: '', body: '' };
   user = { id: 1, name: 'sakshi bahirat' };
+
+  updatePostId: number | null = null;
 
   constructor() {
     this.posts = dummyPosts.map((p) => {
@@ -40,11 +41,46 @@ export class PostComponent {
         liked: false,
       };
     });
+
+    this.findComment(1, 102);
   }
+
+  //
+  findNeigbors() {}
+
+  findComment(postId: number, commentId: number) {
+    const post = this.posts.find((p) => p.id === postId);
+
+    console.log('post', post?.id);
+    console.log('comment', commentId);
+    if (post === undefined) return null;
+    const queue: CommentType[] = [];
+
+    for (let i = 0; i < post.comments.length; i++) {
+      queue.push(post.comments[i]);
+    }
+    //
+    console.log(queue);
+    while (queue.length !== 0) {
+      const comment = queue.shift()!;
+      if (comment?.id === commentId) {
+        console.log('found', comment);
+        return comment;
+      } else {
+        for (let i = 0; i < comment?.comments.length; i++) {
+          queue.push(comment?.comments[i]);
+        }
+      }
+    }
+
+    return null;
+  }
+
   likeComment(postid: number, commentid: number) {
-    const post = this.posts.find((p) => p.id == postid);
+    const post = this.posts.find((p) => p.id === postid);
     if (post === undefined) return;
     const comment = post.comments.find((c) => c.id === commentid);
+    console.log(comment);
     if (comment === undefined) return;
     if (comment.liked === false) {
       if (comment.disliked === true) {
@@ -57,6 +93,21 @@ export class PostComponent {
       comment.likes--;
       comment.liked = false;
     }
+  }
+
+  deletePost(id: number) {
+    this.posts = this.posts.filter((p) => p.id !== id);
+  }
+
+  deleteComment(postId: number, commentId: number) {
+    console.log('sakshi');
+    const post = this.posts.find((p) => p.id === postId);
+    console.log(post);
+    if (post === undefined) return;
+    console.log(post.comments);
+    post.comments = post.comments.filter((c) => c.id !== commentId);
+    console.log(post.comments);
+    console.log(commentId);
   }
 
   dislikeComment(postId: number, commentId: number) {
@@ -93,8 +144,39 @@ export class PostComponent {
     this.newPost.title = '';
     this.newPost.id++;
   }
-  //we want user id thre right on comment comment id
-  addComment(postId: number) {
+  //
+  // updatePostId add changes into existing yes shall we check
+
+  updatePost() {
+    if (this.updatePostId === null) return;
+    const post = this.posts.find((p) => p.id === this.updatePostId);
+    if (post === undefined) return;
+
+    post.title = this.newPost.title;
+    post.body = this.newPost.body;
+    this.newPost.title = '';
+    this.newPost.body = '';
+    this.updatePostId = null;
+  }
+
+  cancelUpdatePost() {
+    this.updatePostId = null;
+    this.newPost.body = '';
+    this.newPost.title = '';
+  }
+  startPostUpdate(id: number) {
+    const post = this.posts.find((p) => p.id === id);
+
+    if (post === undefined) return;
+    console.log(post);
+
+    this.newPost.body = post.body;
+    this.newPost.title = post.title;
+
+    this.updatePostId = post.id;
+  }
+
+  addComment(postId: number, commentId: number) {
     const dummyComent: CommentType = {
       id: this.comment.id,
       user: this.user,
@@ -104,6 +186,7 @@ export class PostComponent {
       dislikes: 0,
       liked: false,
       disliked: false,
+      comments: [],
     };
 
     const post = this.posts.find((p) => p.id === postId);
@@ -173,111 +256,90 @@ type User = {
   name: string;
 };
 
-type CommentType = {
-  id: number;
+export type CommentType = {
   user: User;
   createdAt: Date;
   body: string;
   likes: number;
   dislikes: number;
+  id: number;
+
   liked: boolean;
   disliked: boolean;
+
+  comments: CommentType[];
 };
 
 const dummyPosts: Post[] = [
   {
     id: 1,
-    title: 'The Rise of TypeScript',
-    body: 'TypeScript is gaining massive popularity among JavaScript developers due to its powerful type system.',
+    title: 'First Post',
+    body: 'This is the body of the first post.',
+    likes: 10,
+    dislikes: 2,
+    createdAt: new Date('2025-07-14T10:00:00'),
+    user: {
+      id: 1,
+      name: 'Alice',
+    },
     comments: [
       {
-        id: 1,
-        user: { id: 2, name: 'Jane Doe' },
-        createdAt: new Date('2025-07-01T10:15:00Z'),
-        body: 'Absolutely agree! I love working with TypeScript.',
-        likes: 1,
-        dislikes: 1,
-        liked: false,
+        id: 101,
+        body: 'Great post!',
+        createdAt: new Date('2025-07-14T10:30:00'),
+        likes: 4,
+        dislikes: 0,
+        liked: true,
         disliked: false,
-      },
-
-      {
-        id: 2,
-        user: { id: 3, name: 'Sam Smith' },
-        createdAt: new Date('2025-07-01T11:00:00Z'),
-        body: 'Still learning it, but it already helps me write better code.',
-        likes: 1,
-        dislikes: 1,
-        liked: false,
-        disliked: false,
-      },
-
-      {
-        id: 3,
-        user: { id: 4, name: 'sakshi Bahirat' },
-        createdAt: new Date(),
-        body: 'hellooo',
-        likes: 1,
-        dislikes: 1,
-        liked: false,
-        disliked: false,
+        user: {
+          id: 2,
+          name: 'Bob',
+        },
+        comments: [
+          {
+            id: 102,
+            body: 'Thanks, Bob!',
+            createdAt: new Date('2025-07-14T11:00:00'),
+            likes: 2,
+            dislikes: 0,
+            liked: false,
+            disliked: false,
+            user: {
+              id: 1,
+              name: 'Alice',
+            },
+            comments: [],
+          },
+        ],
       },
     ],
-    likes: 120,
-    dislikes: 5,
-    user: { id: 1, name: 'John Developer' },
-    createdAt: new Date('2025-07-01T09:00:00Z'),
   },
   {
     id: 2,
-    title: 'Dark Mode: A Developer’s Favorite?',
-    body: 'Dark mode has become a staple in developer tools. Is it really better, or just a trend?',
+    title: 'Second Post',
+    body: "Here's some more content to check out.",
+    likes: 5,
+    dislikes: 1,
+    createdAt: new Date('2025-07-15T09:00:00'),
+    user: {
+      id: 3,
+      name: 'Charlie',
+    },
     comments: [
       {
-        id: 3,
-        user: { id: 4, name: 'Alice Johnson' },
-        createdAt: new Date('2025-07-03T14:20:00Z'),
-        body: "I can't live without dark mode anymore!",
-        likes: 1,
-        dislikes: 1,
+        id: 201,
+        body: 'Interesting thoughts.',
+        createdAt: new Date('2025-07-15T09:30:00'),
+        likes: 3,
+        dislikes: 0,
         liked: false,
         disliked: false,
+        user: {
+          id: 4,
+          name: 'Diana',
+        },
+        comments: [],
       },
     ],
-    likes: 95,
-    dislikes: 12,
-    user: { id: 5, name: 'Emily Wright' },
-    createdAt: new Date('2025-07-03T13:00:00Z'),
   },
-  {
-    id: 3,
-    title: 'Why Remote Work is Here to Stay',
-    body: 'Remote work offers flexibility, access to global talent, and better work-life balance.',
-    comments: [],
-    likes: 210,
-    dislikes: 8,
-    user: { id: 6, name: 'Michael Chen' },
-    createdAt: new Date('2025-07-05T08:45:00Z'),
-  },
-
-  {
-    id: 4,
-    title: 'new post',
-    body: 'ello',
-    comments: [],
-    likes: 1,
-    dislikes: 2,
-    user: { id: 7, name: 'Akshata Dange' },
-    createdAt: new Date(),
-  },
-  // {
-  //   id: 5,
-  //   title: 'Bhushan is my love',
-  //   body: 'Very handsome, intelligent and funny ',
-  //   comments: [],
-  //   likes: 1,
-  //   dislikes: 2,
-  //   user: { id: 8, name: 'sAKSHI bahirat' },
-  //   createdAt: new Date(),
-  // },
 ];

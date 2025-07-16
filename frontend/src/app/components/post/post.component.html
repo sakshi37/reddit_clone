@@ -1,33 +1,78 @@
-<div class="container my-4">
-  <div class="mb-4">
-    <h4 class="mb-3">Create a New Post</h4>
-    <div class="input-group mb-2">
-      <span class="input-group-text">Title</span>
+<div class="container my-5">
+  <div class="card p-4 mb-5 shadow-sm">
+    <h4 class="mb-4">Create a New Post</h4>
+
+    <div class="mb-3">
+      <label class="form-label">Title</label>
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="newPost.title"
         placeholder="Enter title"
+        [(ngModel)]="newPost.title"
       />
     </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text">Body</span>
+
+    <div class="mb-3">
+      <label class="form-label">Body</label>
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="newPost.body"
         placeholder="Enter body"
+        [(ngModel)]="newPost.body"
       />
     </div>
-    <button class="btn btn-primary" (click)="addPost()">Add Post</button>
+
+    <div class="d-flex gap-2">
+      <button
+        class="btn btn-success"
+        (click)="addPost()"
+        *ngIf="updatePostId === null"
+      >
+        <i class="bi bi-plus-circle me-1"></i>Add Post
+      </button>
+
+      <button
+        class="btn btn-primary"
+        (click)="updatePost()"
+        *ngIf="updatePostId !== null"
+      >
+        <i class="bi bi-check-circle me-1"></i>Update Post
+      </button>
+
+      <button
+        class="btn btn-outline-secondary"
+        (click)="cancelUpdatePost()"
+        *ngIf="updatePostId !== null"
+      >
+        <i class="bi bi-x-circle me-1"></i>Cancel
+      </button>
+    </div>
   </div>
 
   <div *ngFor="let post of posts" class="card mb-4 shadow-sm">
     <div class="card-body">
-      <h5 class="card-title text-capitalize">{{ post.title }}</h5>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="card-title mb-0 text-capitalize">{{ post.title }}</h5>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="startPostUpdate(post.id)"
+          >
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-danger"
+            (click)="deletePost(post.id)"
+          >
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
+      </div>
+
       <p class="card-text">{{ post.body }}</p>
 
-      <div class="d-flex justify-content-between text-muted mb-2">
+      <div class="d-flex justify-content-between text-muted mb-3">
         <small><strong>By:</strong> {{ post.user.name }}</small>
         <small
           ><strong>Posted on:</strong>
@@ -35,7 +80,7 @@
         >
       </div>
 
-      <div class="d-flex gap-3 align-items-center mb-3">
+      <div class="d-flex gap-2 align-items-center mb-3">
         <button
           class="btn btn-sm"
           [ngClass]="{
@@ -68,72 +113,43 @@
       </div>
 
       <button
-        class="btn btn-secondary btn-sm mb-2"
+        class="btn btn-sm btn-outline-secondary mb-3"
         (click)="toggleComments(post.id)"
       >
         {{ post.id === selectedPostId ? "Hide" : "Show" }} Comments
       </button>
 
       <div *ngIf="post.id === selectedPostId">
-        <h6 class="text-secondary mt-3">Comments:</h6>
+        <h6 class="text-secondary">Comments</h6>
+
         <div *ngIf="post.comments.length === 0" class="text-muted mb-2">
           No Comments Yet
         </div>
 
-        <ul
-          class="list-group list-group-flush mb-3"
-          *ngIf="post.comments.length > 0"
-        >
+        <ul class="list-group mb-3" *ngIf="post.comments.length > 0">
           <li *ngFor="let comment of post.comments" class="list-group-item">
-            <p class="mb-1">{{ comment.body }}</p>
+            <app-comment
+              [comment]="comment"
+              (dislikeComment)="dislikeComment(post.id, comment.id)"
+              (likeComment)="likeComment(post.id, comment.id)"
+              (deleteComment)="deleteComment(post.id, comment.id)"
+            ></app-comment>
 
-            <div class="d-flex gap-2 align-items-center mb-2">
-              <button
-                class="btn btn-sm"
-                [ngClass]="{
-                  'btn-outline-success': !comment.liked,
-                  'btn-success text-white': comment.liked
-                }"
-                (click)="likeComment(post.id, comment.id)"
-              >
-                <i
-                  class="bi bi-hand-thumbs-up-fill me-1"
-                  [style.color]="comment.liked ? 'white' : 'green'"
-                ></i>
-                {{ comment.likes }}
-              </button>
-
-              <button
-                class="btn btn-sm"
-                [ngClass]="{
-                  'btn-outline-danger': !comment.disliked,
-                  'btn-danger text-white': comment.disliked
-                }"
-                (click)="dislikeComment(post.id, comment.id)"
-              >
-                <i
-                  class="bi bi-hand-thumbs-down-fill me-1"
-                  [style.color]="comment.disliked ? 'white' : 'red'"
-                ></i>
-                {{ comment.dislikes }}
-              </button>
-            </div>
-
-            <div class="d-flex justify-content-between text-muted">
-              <small>— {{ comment.user.name }}</small>
-              <small>{{ comment.createdAt | date : "short" }}</small>
-            </div>
+            <button (click)="findComment(post.id, comment.id)">comment</button>
           </li>
         </ul>
 
-        <div class="input-group mb-2">
+        <div class="input-group">
           <input
             type="text"
             class="form-control"
             placeholder="Write a comment..."
             [(ngModel)]="comment.body"
           />
-          <button class="btn btn-outline-primary" (click)="addComment(post.id)">
+          <button
+            class="btn btn-outline-primary"
+            (click)="addComment(post.id, comment.id)"
+          >
             Add
           </button>
         </div>

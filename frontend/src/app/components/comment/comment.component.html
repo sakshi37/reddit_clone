@@ -1,0 +1,46 @@
+<!--THIS IS CHILD COMPONENT   -->
+<div class="d-flex justify-content-between mb-1">
+  <strong>{{ comment.user.name }}</strong>
+  <small class="text-muted">{{ comment.createdAt | date : "short" }}</small>
+</div>
+
+<p class="mb-2">{{ comment.body }}</p>
+
+<div class="d-flex gap-2 align-items-center">
+  <button
+    class="btn btn-sm"
+    [ngClass]="{
+      'btn-outline-success': !comment.liked,
+      'btn-success text-white': comment.liked
+    }"
+    (click)="onLikeComment()"
+  >
+    <i
+      class="bi bi-hand-thumbs-up-fill me-1"
+      [style.color]="comment.liked ? 'white' : 'green'"
+    ></i>
+    {{ comment.likes }}
+  </button>
+
+  <button
+    class="btn btn-sm"
+    [ngClass]="{
+      'btn-outline-danger': !comment.disliked,
+      'btn-danger text-white': comment.disliked
+    }"
+    (click)="onDislikeComment()"
+  >
+    <i
+      class="bi bi-hand-thumbs-down-fill me-1"
+      [style.color]="comment.disliked ? 'white' : 'red'"
+    ></i>
+    {{ comment.dislikes }}
+  </button>
+
+  <button
+    class="btn btn-sm btn-outline-danger ms-auto"
+    (click)="onDeleteComment()"
+  >
+    <i class="bi bi-trash-fill"></i>
+  </button>
+</div>
