@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommentType } from '../post/post.component';
 import { CommonModule } from '@angular/common';
-//
+//display then comment
 @Component({
   selector: 'app-comment',
   standalone: true,

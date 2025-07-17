@@ -44,3 +44,12 @@
     <i class="bi bi-trash-fill"></i>
   </button>
 </div>
+<!-- how do you know post has comment -->
+<!-- comment has comment -->
+<!-- print hello if this comment has comment -->
+<!-- ha  -->
+<div *ngIf="comment.comments.length > 0">
+  <div class="px-3 py-2" *ngFor="let c of comment.comments">
+    <app-comment [comment]="c"></app-comment>
+  </div>
+</div>

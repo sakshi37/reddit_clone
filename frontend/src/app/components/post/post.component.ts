@@ -282,6 +282,7 @@ const dummyPosts: Post[] = [
       id: 1,
       name: 'Alice',
     },
+    //
     comments: [
       {
         id: 101,
@@ -308,7 +309,22 @@ const dummyPosts: Post[] = [
               id: 1,
               name: 'Alice',
             },
-            comments: [],
+            comments: [
+              {
+                id: 110,
+                body: 'hello, tob!',
+                createdAt: new Date('2025-07-14T11:00:00'),
+                likes: 2,
+                dislikes: 0,
+                liked: false,
+                disliked: false,
+                user: {
+                  id: 1,
+                  name: 'Alice',
+                },
+                comments: [],
+              },
+            ],
           },
         ],
       },
