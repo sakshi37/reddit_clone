@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommentType } from '../post/post.component';
+import { CommentType, Post } from '../post/post.component';
 import { CommonModule } from '@angular/common';
 //display then comment
 @Component({
@@ -12,20 +12,18 @@ import { CommonModule } from '@angular/common';
 export class CommentComponent {
   @Input() comment!: CommentType;
 
-  @Output() likeComment = new EventEmitter();
-  @Output() dislikeComment = new EventEmitter();
-  @Output() deleteComment = new EventEmitter();
-
+  @Output() likeComment = new EventEmitter<number>();
+  @Output() dislikeComment = new EventEmitter<number>();
+  @Output() deleteComment = new EventEmitter<number>();
+  //
   onLikeComment() {
-    this.likeComment.emit();
+    this.likeComment.emit(this.comment.id);
   }
   onDislikeComment() {
-    this.dislikeComment.emit();
+    this.dislikeComment.emit(this.comment.id);
   }
   onDeleteComment() {
-    this.deleteComment.emit();
+    this.deleteComment.emit(this.comment.id);
     console.log('dhsf');
   }
 }
-
-// postId, commentId

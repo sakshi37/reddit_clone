@@ -77,6 +77,7 @@ export class PostComponent {
   }
 
   likeComment(postid: number, commentid: number) {
+    console.log(commentid);
     const post = this.posts.find((p) => p.id === postid);
     if (post === undefined) return;
     const comment = post.comments.find((c) => c.id === commentid);
@@ -240,7 +241,7 @@ export class PostComponent {
   // console.log(id);
 }
 
-type Post = {
+export type Post = {
   id: number;
   title: string;
   body: string;

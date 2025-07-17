@@ -130,9 +130,9 @@
           <li *ngFor="let comment of post.comments" class="list-group-item">
             <app-comment
               [comment]="comment"
-              (dislikeComment)="dislikeComment(post.id, comment.id)"
-              (likeComment)="likeComment(post.id, comment.id)"
-              (deleteComment)="deleteComment(post.id, comment.id)"
+              (dislikeComment)="dislikeComment(post.id, $event)"
+              (likeComment)="likeComment(post.id, $event)"
+              (deleteComment)="deleteComment(post.id, $event)"
             ></app-comment>
 
             <!-- <button (click)="findComment(post.id, comment.id)">comment</button> -->
